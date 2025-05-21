@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "404218473153",
+    "project_id": "firebaseappcb013168",
+    "storage_bucket": "firebaseappcb013168.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404218473153:android:6b00a07c93f67625b28240",
+        "android_client_info": {
+          "package_name": "com.example.mad1_thefusionfork"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqQpr4mrlm9bTaJGAFYfMCdPuxwPJ3un0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
