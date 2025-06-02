@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
 
@@ -21,7 +20,7 @@ class _MenuPageState extends State<MenuPage> {
   List<dynamic> menuItems = [];
   bool isLoading = true;
   String errorMessage = '';
-  String baseUrl = 'http://127.0.0.1:8000';
+  String baseUrl = 'http://tff.ubay.lk';
 
   @override
   void initState() {
@@ -33,9 +32,7 @@ class _MenuPageState extends State<MenuPage> {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/api/products'),
-        headers: {
-          'Accept': 'applicatioxn/json',
-        },
+        headers: {'Accept': 'applicatioxn/json'},
       );
 
       if (response.statusCode == 200) {
@@ -73,17 +70,16 @@ class _MenuPageState extends State<MenuPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  const MenuPage()), // Navigate to CartsScreen
+            builder: (context) => const MenuPage(),
+          ), // Navigate to CartsScreen
         );
         break;
       case 2:
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const Cart(
-                    item: {},
-                  )), // Navigate to CartsScreen
+            builder: (context) => const Cart(item: {}),
+          ), // Navigate to CartsScreen
         );
         break;
       case 3:
@@ -91,8 +87,8 @@ class _MenuPageState extends State<MenuPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  const Accpage()), // Navigate to AccountScreen
+            builder: (context) => const Accpage(),
+          ), // Navigate to AccountScreen
         );
         break;
       default:
@@ -109,36 +105,32 @@ class _MenuPageState extends State<MenuPage> {
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Deliver to',
-                style: TextStyle(fontSize: 14, color: Colors.grey)),
+            Text(
+              'Deliver to',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
             Text('Main Street, Colombo 3', style: TextStyle(fontSize: 16)),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : errorMessage.isNotEmpty
               ? Center(child: Text(errorMessage))
               : ListView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: menuItems.length,
-                  itemBuilder: (context, index) {
-                    return ProductCard(item: menuItems[index]);
-                  },
-                ),
+                padding: const EdgeInsets.all(8.0),
+                itemCount: menuItems.length,
+                itemBuilder: (context, index) {
+                  return ProductCard(item: menuItems[index]);
+                },
+              ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => Cart(item: {}),
-            ),
+            MaterialPageRoute(builder: (context) => Cart(item: {})),
           );
         },
         backgroundColor: Colors.orange,
@@ -149,22 +141,13 @@ class _MenuPageState extends State<MenuPage> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Browse',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Browse'),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Carts',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
         ],
       ),
     );

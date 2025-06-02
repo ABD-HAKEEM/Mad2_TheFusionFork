@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mad1_thefusionfork/views/Screens/cart_manager.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class CartPage extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -27,6 +29,58 @@ class _CartPageState extends State<CartPage> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       emailController.text = user.email ?? '';
+    }
+  }
+
+  Future<void> _useCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location services are disabled.')),
+        );
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permission denied.')),
+          );
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permission permanently denied.'),
+          ),
+        );
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        final fullAddress =
+            '${place.street}, ${place.locality}, ${place.country}';
+        addressController.text = fullAddress;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to get location: $e')));
     }
   }
 
@@ -84,7 +138,7 @@ class _CartPageState extends State<CartPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/api/add-order'), // Emulator IP
+        Uri.parse('http://tff.ubay.lk/api/add-order'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(body),
       );
@@ -93,6 +147,16 @@ class _CartPageState extends State<CartPage> {
 
       if (response.statusCode == 200 && responseData['status'] == 'success') {
         CartManager.clearCart();
+        firstNameController.clear();
+        lastNameController.clear();
+        phoneController.clear();
+        addressController.clear();
+        selectedPayment = 'cod';
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CartPage(item: {})),
+        );
+
         setState(() {});
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'] ?? 'Order placed')),
@@ -151,7 +215,22 @@ class _CartPageState extends State<CartPage> {
               phoneController,
               keyboardType: TextInputType.phone,
             ),
-            _buildTextField('Shipping Address', addressController, maxLines: 2),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    'Shipping Address',
+                    addressController,
+                    maxLines: 2,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.my_location, color: Colors.blue),
+                  tooltip: 'Use Current Location',
+                  onPressed: _useCurrentLocation,
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
             const Text(
               'Payment Method:',
@@ -209,7 +288,7 @@ class _CartPageState extends State<CartPage> {
         child: Row(
           children: [
             Image.network(
-              'http://10.0.2.2:8000${item['image']}',
+              'http://tff.ubay.lk/${item['image']}',
               width: 80,
               height: 80,
               fit: BoxFit.cover,

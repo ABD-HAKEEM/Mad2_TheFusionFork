@@ -3,13 +3,15 @@ import 'package:mad1_thefusionfork/views/Screens/ProductSinglePage.dart';
 import 'package:mad1_thefusionfork/views/Screens/cart_manager.dart';
 import 'package:mad1_thefusionfork/views/Screens/cartsscreen.dart';
 
-
 class ProductCard extends StatelessWidget {
   final Map<String, dynamic> item;
   const ProductCard({super.key, required this.item});
 
-  void _addToCart(BuildContext context, Map<String, dynamic> item,
-      {bool buyNow = false}) {
+  void _addToCart(
+    BuildContext context,
+    Map<String, dynamic> item, {
+    bool buyNow = false,
+  }) {
     CartManager.addItem(item);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -22,10 +24,7 @@ class ProductCard extends StatelessWidget {
     if (buyNow) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) => CartPage(
-                  item: item,
-                )),
+        MaterialPageRoute(builder: (context) => CartPage(item: item)),
       );
     }
   }
@@ -43,15 +42,13 @@ class ProductCard extends StatelessWidget {
       },
       child: Card(
         elevation: 5,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
               Image.network(
-                'http://10.0.2.2:8000${item['image']}',
+                'http://tff.ubay.lk${item['image']}',
                 height: 100,
                 width: 100,
                 fit: BoxFit.cover,
@@ -107,8 +104,12 @@ class ProductCard extends StatelessWidget {
                             icon: const Icon(Icons.shopping_bag, size: 18),
                             label: const Text('Buy Now'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 175, 76, 111),
+                              backgroundColor: const Color.fromARGB(
+                                255,
+                                175,
+                                76,
+                                111,
+                              ),
                               foregroundColor: Colors.white,
                             ),
                           ),
@@ -125,8 +126,12 @@ class ProductCard extends StatelessWidget {
                               side: const BorderSide(
                                 color: Color.fromARGB(255, 175, 76, 111),
                               ),
-                              foregroundColor:
-                                  const Color.fromARGB(255, 175, 76, 111),
+                              foregroundColor: const Color.fromARGB(
+                                255,
+                                175,
+                                76,
+                                111,
+                              ),
                             ),
                           ),
                         ),

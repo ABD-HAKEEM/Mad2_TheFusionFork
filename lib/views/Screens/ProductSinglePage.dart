@@ -3,13 +3,15 @@ import 'package:mad1_thefusionfork/views/Screens/CartPage.dart';
 import 'package:mad1_thefusionfork/views/Screens/cart_manager.dart';
 import 'package:mad1_thefusionfork/views/Screens/cartsscreen.dart';
 
-
 class ProductSinglePage extends StatelessWidget {
   final Map<String, dynamic> item;
   const ProductSinglePage({super.key, required this.item});
 
-  void _addToCart(BuildContext context, Map<String, dynamic> item,
-      {bool buyNow = false}) {
+  void _addToCart(
+    BuildContext context,
+    Map<String, dynamic> item, {
+    bool buyNow = false,
+  }) {
     CartManager.addItem(item);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -22,10 +24,7 @@ class ProductSinglePage extends StatelessWidget {
     if (buyNow) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) => CartPage(
-                  item: item,
-                )),
+        MaterialPageRoute(builder: (context) => CartPage(item: item)),
       );
     }
   }
@@ -43,9 +42,10 @@ class ProductSinglePage extends StatelessWidget {
           builder: (context, orientation) {
             return Padding(
               padding: const EdgeInsets.all(16.0),
-              child: orientation == Orientation.portrait
-                  ? _buildPortraitLayout(context)
-                  : _buildLandscapeLayout(context),
+              child:
+                  orientation == Orientation.portrait
+                      ? _buildPortraitLayout(context)
+                      : _buildLandscapeLayout(context),
             );
           },
         ),
@@ -56,11 +56,13 @@ class ProductSinglePage extends StatelessWidget {
   Widget _buildPortraitLayout(BuildContext context) {
     final String name = item['name'] ?? 'Unknown Product';
     final String description = item['description'] ?? '';
-    final String imageUrl = 'http://10.0.2.2:8000${item['image']}';
+    final String imageUrl = 'http://tff.ubay.lk${item['image']}';
     final String price =
         double.tryParse(item['price'].toString())?.toStringAsFixed(2) ?? '0.00';
-    final String stock = double.tryParse(item['stock_quantity'].toString())
-            ?.toStringAsFixed(2) ??
+    final String stock =
+        double.tryParse(
+          item['stock_quantity'].toString(),
+        )?.toStringAsFixed(2) ??
         '0.00';
 
     return Column(
@@ -85,7 +87,10 @@ class ProductSinglePage extends StatelessWidget {
         Text(
           name,
           style: const TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         Text(
           description,
@@ -148,9 +153,7 @@ class ProductSinglePage extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => Cart(item: item),
-                ),
+                MaterialPageRoute(builder: (context) => Cart(item: item)),
               );
             },
             backgroundColor: Colors.orange,
@@ -164,11 +167,13 @@ class ProductSinglePage extends StatelessWidget {
   Widget _buildLandscapeLayout(BuildContext context) {
     final String name = item['name'] ?? '';
     final String description = item['description'] ?? '';
-    final String imageUrl = 'http://10.0.2.2:8000${item['image']}';
+    final String imageUrl = 'http://tff.ubay.lk/${item['image']}';
     final String price =
         double.tryParse(item['price'].toString())?.toStringAsFixed(2) ?? '0.00';
-    final String stock = double.tryParse(item['stock_quantity'].toString())
-            ?.toStringAsFixed(2) ??
+    final String stock =
+        double.tryParse(
+          item['stock_quantity'].toString(),
+        )?.toStringAsFixed(2) ??
         '0.00';
 
     return Row(
@@ -199,8 +204,10 @@ class ProductSinglePage extends StatelessWidget {
             children: <Widget>[
               Text(
                 name,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 description,
@@ -259,9 +266,7 @@ class ProductSinglePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => Cart(item: item),
-                      ),
+                      MaterialPageRoute(builder: (context) => Cart(item: item)),
                     );
                   },
                   backgroundColor: Colors.orange,

@@ -4,6 +4,7 @@ import 'package:mad1_thefusionfork/views/Screens/CartPage.dart';
 import 'package:mad1_thefusionfork/views/Screens/accountscreen.dart';
 import 'package:mad1_thefusionfork/views/Screens/menupage.dart';
 import 'package:provider/provider.dart';
+import 'package:battery_plus/battery_plus.dart';
 
 class homepage extends StatefulWidget {
   const homepage({super.key});
@@ -14,6 +15,31 @@ class homepage extends StatefulWidget {
 
 class _HomepageState extends State<homepage> {
   int _selectedIndex = 0;
+
+  Battery _battery = Battery();
+  int _batteryLevel = 0;
+  BatteryState _batteryState = BatteryState.unknown;
+
+  @override
+  void initState() {
+    super.initState();
+    _getBatteryInfo();
+    _battery.onBatteryStateChanged.listen((BatteryState state) {
+      setState(() {
+        _batteryState = state;
+      });
+    });
+  }
+
+  Future<void> _getBatteryInfo() async {
+    final level = await _battery.batteryLevel;
+    final state = await _battery.batteryState;
+
+    setState(() {
+      _batteryLevel = level;
+      _batteryState = state;
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -116,6 +142,19 @@ class _HomepageState extends State<homepage> {
                   onPressed: () {
                     themeProvider.toggleTheme();
                   },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _batteryState == BatteryState.charging
+                          ? Icons.battery_charging_full
+                          : Icons.battery_std,
+                      color: _batteryLevel < 20 ? Colors.red : Colors.green,
+                    ),
+                    const SizedBox(width: 8),
+                    Text('$_batteryLevel% '),
+                  ],
                 ),
               ],
             ),

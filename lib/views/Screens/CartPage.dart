@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mad1_thefusionfork/views/Screens/cartsscreen.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:mad1_thefusionfork/views/Screens/menupage.dart';
-
 import 'cart_manager.dart';
 
 class Cart extends StatefulWidget {
@@ -12,6 +13,52 @@ class Cart extends StatefulWidget {
 }
 
 class _CartState extends State<Cart> {
+  late final StreamSubscription<GyroscopeEvent> _gyroSubscription;
+  bool _cartCleared = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startGyroscopeListener();
+  }
+
+  void _startGyroscopeListener() {
+    _gyroSubscription = gyroscopeEvents.listen((GyroscopeEvent event) {
+      const double rotationThreshold = 5.0;
+
+      // If user shakes/rotates the phone fast enough and cart isn't already cleared
+      if (!_cartCleared &&
+          (event.x.abs() > rotationThreshold ||
+              event.y.abs() > rotationThreshold)) {
+        _cartCleared = true;
+
+        setState(() {
+          CartManager.clearCart();
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Cart cleared via gyroscope!"),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MenuPage()),
+          );
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _gyroSubscription.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartItems = CartManager.items;
@@ -35,22 +82,9 @@ class _CartState extends State<Cart> {
         itemCount: cartItems.length,
         itemBuilder: (context, index) {
           final item = cartItems[index];
-
-          void removeItem() {
-            setState(() {
-              CartManager.removeItem(item);
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${item['name']} removed from cart'),
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          }
-
           return ListTile(
             leading: Image.network(
-              'http://10.0.2.2:8000${item['image']}',
+              'http://tff.ubay.lk/${item['image']}',
               width: 50,
               height: 50,
               fit: BoxFit.cover,
@@ -59,15 +93,13 @@ class _CartState extends State<Cart> {
             ),
             title: Text(item['name'] ?? ''),
             subtitle: Text('Price: \$${item['price']}'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('\$${item['price']}'),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: removeItem,
-                ),
-              ],
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                setState(() {
+                  CartManager.removeItem(item);
+                });
+              },
             ),
           );
         },
@@ -83,19 +115,6 @@ class _CartState extends State<Cart> {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: const Text('Place Order'),
-              onPressed: () {
-                var item = cartItems[0];
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CartPage(item: item)),
-                );
-              },
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: const Text('Clear Cart'),
               onPressed: () {
                 setState(() {
                   CartManager.clearCart();
@@ -104,13 +123,29 @@ class _CartState extends State<Cart> {
                   context,
                   MaterialPageRoute(builder: (context) => const MenuPage()),
                 );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Cart cleared!'),
-                    duration: Duration(seconds: 2),
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 234, 130, 120),
+              ),
+              child: const Text('Clear Cart'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Pass the entire cart or the first item as an example
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => CartPage(
+                          item: cartItems.isNotEmpty ? cartItems[0] : {},
+                        ),
                   ),
                 );
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 145, 175, 76),
+              ),
+              child: const Text('Checkout'),
             ),
           ],
         ),
