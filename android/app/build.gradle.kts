@@ -9,7 +9,7 @@ plugins {
 android {
     namespace = "com.example.mad1_thefusionfork"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+     ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

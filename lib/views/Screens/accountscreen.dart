@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mad1_thefusionfork/theme_provider.dart';
 import 'package:mad1_thefusionfork/views/Screens/CartPage.dart' show Cart;
 import 'package:mad1_thefusionfork/views/Screens/HomeScreen.dart' show homepage;
+import 'package:mad1_thefusionfork/views/Screens/login.dart';
 import 'package:provider/provider.dart';
 
 import '../../views/Screens/Menupage.dart';
@@ -124,7 +125,14 @@ class _AccpageState extends State<Accpage> {
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
-              onPressed: () => FirebaseAuth.instance.signOut(),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AuthGate()),
+                  (Route<dynamic> route) => false,
+                );
+              },
             ),
           ],
         ),

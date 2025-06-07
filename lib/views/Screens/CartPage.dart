@@ -13,23 +13,23 @@ class Cart extends StatefulWidget {
 }
 
 class _CartState extends State<Cart> {
-  late final StreamSubscription<GyroscopeEvent> _gyroSubscription;
+  late final StreamSubscription<AccelerometerEvent> _gyroSubscription;
   bool _cartCleared = false;
 
   @override
   void initState() {
     super.initState();
-    _startGyroscopeListener();
+    _startShakeListener();
   }
 
-  void _startGyroscopeListener() {
-    _gyroSubscription = gyroscopeEvents.listen((GyroscopeEvent event) {
-      const double rotationThreshold = 5.0;
+  void _startShakeListener() {
+    _gyroSubscription = accelerometerEvents.listen((AccelerometerEvent event) {
+      const double shakeThreshold = 15.0;
 
-      // If user shakes/rotates the phone fast enough and cart isn't already cleared
-      if (!_cartCleared &&
-          (event.x.abs() > rotationThreshold ||
-              event.y.abs() > rotationThreshold)) {
+      double acceleration =
+          event.x * event.x + event.y * event.y + event.z * event.z;
+
+      if (!_cartCleared && acceleration > shakeThreshold * shakeThreshold) {
         _cartCleared = true;
 
         setState(() {
@@ -38,7 +38,7 @@ class _CartState extends State<Cart> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Cart cleared via gyroscope!"),
+            content: Text("Cart cleared via shake!"),
             duration: Duration(seconds: 2),
           ),
         );
@@ -51,12 +51,6 @@ class _CartState extends State<Cart> {
         });
       }
     });
-  }
-
-  @override
-  void dispose() {
-    _gyroSubscription.cancel();
-    super.dispose();
   }
 
   @override
@@ -104,48 +98,78 @@ class _CartState extends State<Cart> {
           );
         },
       ),
+
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Total: \$${CartManager.totalPrice.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  CartManager.clearCart();
-                });
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MenuPage()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 234, 130, 120),
-              ),
-              child: const Text('Clear Cart'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Pass the entire cart or the first item as an example
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => CartPage(
-                          item: cartItems.isNotEmpty ? cartItems[0] : {},
-                        ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Center(
+                child: Text(
+                  'Shake your phone to clear the cart!',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
                   ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 145, 175, 76),
+                ),
               ),
-              child: const Text('Checkout'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total: \$${CartManager.totalPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      CartManager.clearCart();
+                    });
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MenuPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 190, 16, 0),
+                  ),
+                  child: const Text('Clear Cart'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Pass the entire cart or the first item as an example
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => CartPage(
+                              item: cartItems.isNotEmpty ? cartItems[0] : {},
+                            ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 102, 146, 2),
+                  ),
+                  child: const Text(
+                    'Checkout',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
