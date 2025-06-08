@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mad1_thefusionfork/views/Screens/HomeScreen.dart';
 import 'package:mad1_thefusionfork/views/Screens/registration.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -34,7 +38,49 @@ class _SignInScreenState extends State<SignInScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  late final StreamSubscription connectivitySubscription;
+  bool hasInternet = true;
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    startMonitoring();
+  }
+
+  void startMonitoring() {
+    connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      result,
+    ) async {
+      bool isConnected = await InternetConnectionChecker.instance.hasConnection;
+
+      if (mounted && hasInternet != isConnected) {
+        setState(() {
+          hasInternet = isConnected;
+        });
+
+        final msg =
+            isConnected
+                ? "✅ Internet connection restored"
+                : "⚠️ No internet connection";
+        final color = isConnected ? Colors.green : Colors.red;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(msg),
+            backgroundColor: color,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    connectivitySubscription.cancel();
+    super.dispose();
+  }
 
   void signIn() async {
     setState(() => isLoading = true);

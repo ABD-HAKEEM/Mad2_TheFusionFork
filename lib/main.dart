@@ -6,6 +6,7 @@ import 'package:mad1_thefusionfork/views/Screens/cartsscreen.dart';
 import 'package:mad1_thefusionfork/views/Screens/login.dart';
 import 'package:mad1_thefusionfork/views/Screens/menupage.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,10 +26,17 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late StreamSubscription connectivitySubscription;
+  bool hasInternet = true;
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
